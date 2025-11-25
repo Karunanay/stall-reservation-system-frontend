@@ -7,9 +7,14 @@ import { MAP_ROWS, MAP_COLS } from "@/utils/layoutGenerator";
 interface MapContainerProps {
   mapId: number;
   stalls: Stall[];
+  selectedStallIds?: string[];
+  myReservedStallIds?: string[];
+  onStallClick?: (stall: Stall) => void;
 }
 
-export function MapContainer({ mapId, stalls }: MapContainerProps) {
+export function MapContainer({ mapId, stalls, selectedStallIds = [], myReservedStallIds = [], onStallClick }: MapContainerProps) {
+  console.log("MapContainer rendered", { mapId, stallsCount: stalls.length, selectedStallIds });
+
   return (
     <Flex direction="column" gap="4" width="100%" height="100%">
       <Text size="5" weight="bold">Hall {mapId}</Text>
@@ -40,17 +45,32 @@ export function MapContainer({ mapId, stalls }: MapContainerProps) {
             maxHeight: '100%'
         }}>
             {stalls.map((stall) => (
-                <Card 
-                  key={stall.id} 
-                  style={{ 
+                <div
+                  key={stall.id}
+                  style={{
                     gridColumn: `${stall.col + 1} / span ${stall.colSpan}`,
                     gridRow: `${stall.row + 1} / span ${stall.rowSpan}`,
+                    width: '100%',
+                    height: '100%',
+                  }}
+                  onClick={() => {
+                    console.log("Card wrapper clicked", stall.id);
+                    onStallClick?.(stall);
+                  }}
+                >
+                <Card 
+                  style={{ 
                     width: '100%',
                     height: '100%', 
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'center',
-                    backgroundColor: stall.status === 'reserved' ? 'var(--gray-5)' : 'var(--green-3)',
+                    backgroundColor: stall.status === 'reserved' 
+                      ? (myReservedStallIds.includes(stall.id) ? 'var(--purple-9)' : 'var(--gray-5)')
+                      : selectedStallIds.includes(stall.id)
+                        ? 'var(--blue-9)'
+                        : 'var(--green-3)',
+                    color: (selectedStallIds.includes(stall.id) || (stall.status === 'reserved' && myReservedStallIds.includes(stall.id))) ? 'white' : 'inherit',
                     cursor: 'pointer',
                     padding: '2px'
                   }}
@@ -59,6 +79,7 @@ export function MapContainer({ mapId, stalls }: MapContainerProps) {
                     <Text size="1" weight="bold" style={{ fontSize: 'clamp(8px, 1vw, 12px)' }}>{stall.name}</Text>
                   </Flex>
                 </Card>
+                </div>
             ))}
         </div>
       </Box>
@@ -71,6 +92,14 @@ export function MapContainer({ mapId, stalls }: MapContainerProps) {
         <Flex align="center" gap="2">
           <Box style={{ width: 16, height: 16, backgroundColor: 'var(--gray-5)', border: '1px solid var(--gray-6)' }} />
           <Text size="2">Reserved</Text>
+        </Flex>
+        <Flex align="center" gap="2">
+          <Box style={{ width: 16, height: 16, backgroundColor: 'var(--purple-9)', border: '1px solid var(--purple-10)' }} />
+          <Text size="2">My Reservations</Text>
+        </Flex>
+        <Flex align="center" gap="2">
+          <Box style={{ width: 16, height: 16, backgroundColor: 'var(--blue-9)', border: '1px solid var(--blue-10)' }} />
+          <Text size="2">Selected</Text>
         </Flex>
       </Flex>
     </Flex>

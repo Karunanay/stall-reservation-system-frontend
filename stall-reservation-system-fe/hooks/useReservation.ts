@@ -300,6 +300,33 @@ export function useReservation(eventId: string) {
     }));
   };
 
+  const downloadQRCode = async (reservationId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch(`https://fluffy-train-xqwq79vrw7x29qpx-8080.app.github.dev/api/reservations/${reservationId}/qr-code`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reservation-${reservationId}-qr.png`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+    }
+  };
+
   const processReservation = async (): Promise<boolean> => {
     if (cart.length === 0) return false;
 
@@ -347,6 +374,11 @@ export function useReservation(eventId: string) {
           successCount++;
           reservations.push(result.data);
           console.log('Reservation created:', result.data);
+          
+          // Automatically download QR code
+          if (result.data && result.data.id) {
+            await downloadQRCode(result.data.id);
+          }
         } else {
           toast.error(result.message || `Failed to reserve stall ${stall.name}`);
           console.error('Reservation failed:', result);
@@ -387,6 +419,7 @@ export function useReservation(eventId: string) {
     toggleCartItem,
     removeFromCart,
     updateStallGenres,
-    processReservation
+    processReservation,
+    downloadQRCode
   };
 }

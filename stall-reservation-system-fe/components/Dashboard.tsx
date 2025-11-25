@@ -1,6 +1,7 @@
 "use client";
 
 import { Flex, Text, Card, Button, Heading, Checkbox, Grid, Badge, Box } from "@radix-ui/themes";
+import { DownloadIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -23,6 +24,7 @@ export function Dashboard() {
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
   const [userReservations, setUserReservations] = useState<Reservation[]>([]);
   const [isLoadingReservations, setIsLoadingReservations] = useState(true);
+  const [downloadingReservationId, setDownloadingReservationId] = useState<number | null>(null);
 
   // Fetch upcoming events
   useEffect(() => {
@@ -111,6 +113,41 @@ export function Dashboard() {
     setTimeout(() => setIsSaving(false), 500); // Fake delay for feedback
   };
 
+  const handleDownloadQR = async (reservationId: number) => {
+    try {
+      setDownloadingReservationId(reservationId);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setDownloadingReservationId(null);
+        return;
+      }
+
+      const response = await fetch(`https://fluffy-train-xqwq79vrw7x29qpx-8080.app.github.dev/api/reservations/${reservationId}/qr-code`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reservation-${reservationId}-qr.png`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } else {
+        console.error('Failed to download QR code');
+      }
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+    } finally {
+      setDownloadingReservationId(null);
+    }
+  };
+
   return (
     <Flex direction="column" gap="6" width="100%">
       <Box>
@@ -153,9 +190,26 @@ export function Dashboard() {
                           <Text size="2" color="gray">Stall: {reservation.stallNumber} (Hall {reservation.hallNumber})</Text>
                           <Text size="1" color="gray">Code: {reservation.reservationCode}</Text>
                         </Flex>
-                        <Badge color={reservation.status === 'CONFIRMED' ? 'green' : 'orange'}>
-                          {reservation.status}
-                        </Badge>
+                        <Flex direction="column" align="end" gap="2">
+                          <Badge color={reservation.status === 'CONFIRMED' ? 'green' : 'orange'}>
+                            {reservation.status}
+                          </Badge>
+                          <Button 
+                            size="1" 
+                            variant="outline" 
+                            onClick={() => handleDownloadQR(reservation.id)} 
+                            style={{ cursor: 'pointer' }}
+                            disabled={downloadingReservationId === reservation.id}
+                          >
+                            {downloadingReservationId === reservation.id ? (
+                              "Downloading..."
+                            ) : (
+                              <>
+                                <DownloadIcon /> QR Code
+                              </>
+                            )}
+                          </Button>
+                        </Flex>
                       </Flex>
                       {reservation.genres && reservation.genres.length > 0 && (
                         <Flex gap="1" wrap="wrap">

@@ -1,3 +1,9 @@
+"use client";
+
+import { Flex, Button, AlertDialog, Text } from "@radix-ui/themes";
+import { MapContainer } from "./MapContainer";
+import { OverviewMap } from "./OverviewMap";
+import { Cart } from "./Cart";
 import { useState } from "react";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useReservation } from "@/hooks/useReservation";
@@ -73,16 +79,14 @@ export function BookfairMap({ eventId }: BookfairMapProps) {
                 Cancel
               </Button>
             </AlertDialog.Cancel>
-            <AlertDialog.Action>
-              <Button 
-                variant="solid" 
-                color="green" 
-                onClick={handleConfirmReservation}
-                disabled={isProcessing}
-              >
-                {isProcessing ? 'Processing...' : 'Confirm Reservation'}
-              </Button>
-            </AlertDialog.Action>
+            <Button 
+              variant="solid" 
+              color="green" 
+              onClick={handleConfirmReservation}
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Processing...' : 'Confirm Reservation'}
+            </Button>
           </Flex>
         </AlertDialog.Content>
       </AlertDialog.Root>
@@ -122,3 +126,6 @@ export function BookfairMap({ eventId }: BookfairMapProps) {
           onCheckout={() => setShowConfirmDialog(true)} 
         />
       )}
+    </Flex>
+  );
+}

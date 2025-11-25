@@ -1,21 +1,19 @@
 "use client";
 
-import { Flex, Text, TextField, Button, Card, Container, Select, Callout } from "@radix-ui/themes";
+import { Flex, Text, TextField, Button, Card, Container, Select } from "@radix-ui/themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -28,13 +26,13 @@ export default function RegisterPage() {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (!fullName || !email || !phoneNumber || !companyName || !password || !confirmPassword) {
-      setError("All fields are required.");
+      toast.error("All fields are required.");
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      toast.error("Passwords do not match.");
       setLoading(false);
       return;
     }
@@ -59,14 +57,15 @@ export default function RegisterPage() {
       const data = await response.json();
       console.log(data);
       if (data.success) {
+        toast.success("Registration successful!");
         login(data.data.token, data.data);
-        router.push('/reservations');
+        router.push('/');
       } else {
         // Display the specific error message from the backend (e.g., weak password, existing email)
-        setError(data.data || "Registration failed. Please try again.");
+        toast.error(data.data || "Registration failed. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred. Please try again later.");
+      toast.error("An error occurred. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -80,17 +79,6 @@ export default function RegisterPage() {
             <Flex direction="column" gap="4">
               <Text size="6" weight="bold" align="center">Register</Text>
               
-              {error && (
-                <Callout.Root color="red">
-                  <Callout.Icon>
-                    <ExclamationTriangleIcon />
-                  </Callout.Icon>
-                  <Callout.Text>
-                    {error}
-                  </Callout.Text>
-                </Callout.Root>
-              )}
-
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Full Name</Text>
                 <TextField.Root placeholder="Enter your name" name="fullName" required />
