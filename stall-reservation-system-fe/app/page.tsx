@@ -7,6 +7,17 @@ import { Dashboard } from "@/components/Dashboard";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
+<<<<<<< main
+
+  if (isAuthenticated) {
+    return (
+      <Container size="4" p="4">
+        <Dashboard />
+      </Container>
+    );
+  }
+=======
+>>>>>>> main
 
   if (isAuthenticated) {
     return (

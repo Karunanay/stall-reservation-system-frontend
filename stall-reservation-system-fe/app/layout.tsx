@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Theme } from "@radix-ui/themes";
-import "@radix-ui/themes/styles.css";
 import "./globals.css";
-import { AuthProvider } from "@/context/AuthContext";
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "sonner";
 
@@ -18,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stall Reservation System",
-  description: "Book your stall today",
+  title: "Bookfair Management System",
+  description: "Manage your bookfair layout and stalls",
 };
 
 export default function RootLayout({
