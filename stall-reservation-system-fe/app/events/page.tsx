@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Heading, Grid, Card, Flex, Text, Badge, Button, Box } from "@radix-ui/themes";
+import { Container, Heading, Grid, Card, Flex, Text, Badge, Button, Box, Skeleton } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { Event } from "@/types";
 import Link from "next/link";
@@ -32,7 +32,41 @@ export default function EventsPage() {
       <Heading size="8" mb="6">All Events</Heading>
 
       {isLoading ? (
-        <Text>Loading events...</Text>
+        <Grid columns={{ initial: '1', md: '2', lg: '3' }} gap="4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} size="3">
+              <Flex direction="column" gap="3" height="100%">
+                <Flex justify="between" align="start">
+                  <Skeleton width="60px" height="20px" />
+                  <Skeleton width="100px" height="20px" />
+                </Flex>
+
+                <Skeleton width="80%" height="24px" />
+                
+                <Box style={{ flex: 1 }}>
+                  <Skeleton width="100%" height="16px" />
+                  <Skeleton width="90%" height="16px" style={{ marginTop: '4px' }} />
+                </Box>
+
+                <Box>
+                  <Flex gap="2" align="center" mb="1">
+                    <Skeleton width="16px" height="16px" />
+                    <Skeleton width="120px" height="16px" />
+                  </Flex>
+                  <Flex gap="2" align="center">
+                    <Skeleton width="16px" height="16px" />
+                    <Skeleton width="150px" height="16px" />
+                  </Flex>
+                </Box>
+
+                <Flex justify="between" align="center" mt="2">
+                  <Skeleton width="100px" height="16px" />
+                  <Skeleton width="100px" height="32px" />
+                </Flex>
+              </Flex>
+            </Card>
+          ))}
+        </Grid>
       ) : events.length === 0 ? (
         <Text>No events found.</Text>
       ) : (
