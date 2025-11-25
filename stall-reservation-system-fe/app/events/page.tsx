@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { Event } from "@/types";
 import Link from "next/link";
 import { CalendarIcon, SewingPinIcon, ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const ITEMS_PER_PAGE = 6;
 
@@ -12,11 +14,18 @@ export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const searchParams = useSearchParams();
+  const filter = searchParams.get('filter');
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch('https://fluffy-train-xqwq79vrw7x29qpx-8080.app.github.dev/api/events');
+        const endpoint = filter === 'upcoming' 
+          ? 'https://fluffy-train-xqwq79vrw7x29qpx-8080.app.github.dev/api/events/upcoming'
+          : 'https://fluffy-train-xqwq79vrw7x29qpx-8080.app.github.dev/api/events';
+          
+        const response = await fetch(endpoint);
         if (response.ok) {
           const data = await response.json();
           setEvents(Array.isArray(data) ? data : data.data || []);
@@ -28,7 +37,7 @@ export default function EventsPage() {
       }
     };
     fetchEvents();
-  }, []);
+  }, [filter]);
 
   const totalPages = Math.ceil(events.length / ITEMS_PER_PAGE);
   const currentEvents = events.slice(
@@ -48,7 +57,7 @@ export default function EventsPage() {
   return (
     <div style={{ height: 'calc(100vh - 65px)', display: 'flex', flexDirection: 'column' }}>
       <Box p="4" style={{ flex: 1, overflowY: 'auto' }} id="events-scroll-container">
-        <Heading size="8" mb="6">All Events</Heading>
+        <Heading size="8" mb="6">{filter === 'upcoming' ? 'Upcoming Events' : 'All Events'}</Heading>
 
                 {isLoading ? (
           <Grid columns={{ initial: '1', md: '2', lg: '3', xl: '4' }} gap="4">
@@ -122,11 +131,17 @@ export default function EventsPage() {
                     <Text size="2" color="gray">
                       {event.availableStalls} / {event.totalStalls} Stalls
                     </Text>
-                    <Link href={`/reservations?eventId=${event.id}`}>
-                      <Button size="1" disabled={!event.registrationOpen}>
-                        View Details
+                    {isAuthenticated ? (
+                      <Link href={`/reservations?eventId=${event.id}`}>
+                        <Button size="1" disabled={!event.registrationOpen}>
+                          View Details
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button size="1" disabled variant="soft">
+                        Login to View
                       </Button>
-                    </Link>
+                    )}
                   </Flex>
                 </Flex>
               </Card>

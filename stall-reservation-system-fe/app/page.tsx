@@ -26,9 +26,9 @@ export default function Home() {
         </Box>
 
         <Flex gap="4" mt="4">
-          <Link href="/reservations">
+          <Link href="/events?filter=upcoming">
             <Button size="4" variant="solid" style={{ cursor: 'pointer' }}>
-              View Reservations
+              View Upcoming Events
             </Button>
           </Link>
           <Link href="/register">

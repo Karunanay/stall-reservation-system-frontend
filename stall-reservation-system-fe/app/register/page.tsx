@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Flex, Text, TextField, Button, Card, Container, Select } from "@radix-ui/themes";
+import { Flex, Text, TextField, Button, Card, Container, Select, Grid, Box } from "@radix-ui/themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -66,52 +66,58 @@ export default function RegisterPage() {
   };
 
   return (
-    <Container size="1" p="4">
+    <Container size="2">
       <Flex direction="column" justify="center" style={{ minHeight: '100vh' }}>
         <Card>
           <form onSubmit={handleRegister}>
             <Flex direction="column" gap="4">
               <Text size="6" weight="bold" align="center">Register</Text>
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Full Name</Text>
-                <TextField.Root placeholder="Enter your name" name="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-              </Flex>
 
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Email</Text>
-                <TextField.Root placeholder="Enter your email" type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-              </Flex>
+              <Grid columns={{ initial: '1', sm: '2' }} gap="4">
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Full Name</Text>
+                  <TextField.Root placeholder="Enter your name" name="fullName" required />
+                </Flex>
 
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Phone Number</Text>
-                <TextField.Root placeholder="+94771234570" type="tel" name="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
-              </Flex>
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Email</Text>
+                  <TextField.Root placeholder="Enter your email" type="email" name="email" required />
+                </Flex>
 
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Company Name</Text>
-                <TextField.Root placeholder="Enter company name" name="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
-              </Flex>
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Phone Number</Text>
+                  <TextField.Root placeholder="+94771234570" type="tel" name="phoneNumber" required />
+                </Flex>
 
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Role</Text>
-                <Select.Root defaultValue="VENDOR" name="role">
-                  <Select.Trigger />
-                  <Select.Content>
-                    <Select.Item value="VENDOR">Vendor</Select.Item>
-                    <Select.Item value="PUBLISHER">Publisher</Select.Item>
-                  </Select.Content>
-                </Select.Root>
-              </Flex>
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Company Name</Text>
+                  <TextField.Root placeholder="Enter company name" name="companyName" required />
+                </Flex>
 
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Password</Text>
-                <TextField.Root placeholder="Create a password" type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              </Flex>
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Role</Text>
+                  <Select.Root defaultValue="VENDOR" name="role">
+                    <Select.Trigger />
+                    <Select.Content>
+                      <Select.Item value="VENDOR">Vendor</Select.Item>
+                      <Select.Item value="PUBLISHER">Publisher</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </Flex>
 
-              <Flex direction="column" gap="2">
-                <Text size="2" weight="bold">Re-enter Password</Text>
-                <TextField.Root placeholder="Confirm your password" type="password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-              </Flex>
+                {/* Empty div to push password fields to next row */}
+                <Box display={{ initial: 'none', sm: 'block' }} />
+                
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Password</Text>
+                  <TextField.Root placeholder="Create a password" type="password" name="password" required />
+                </Flex>
+
+                <Flex direction="column" gap="2">
+                  <Text size="2" weight="bold">Re-enter Password</Text>
+                  <TextField.Root placeholder="Confirm your password" type="password" name="confirmPassword" required />
+                </Flex>
+              </Grid>
 
               <Button size="3" type="submit" mt="2" disabled={loading}>
                 {loading ? "Registering..." : "Register"}
