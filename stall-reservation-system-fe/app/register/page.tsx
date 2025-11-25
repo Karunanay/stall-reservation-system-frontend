@@ -12,13 +12,16 @@ export default function RegisterPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-
-    const formData = new FormData(e.currentTarget);
-    const confirmPassword = formData.get("confirmPassword") as string;
 
     if (!fullName || !email || !phoneNumber || !companyName || !password || !confirmPassword) {
       toast.error("All fields are required.");
@@ -31,14 +34,28 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
-    const data = await response.json();
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phoneNumber,
+          companyName,
+          password,
+          role: "VENDOR",
+        }),
+      });
+
+      const data = await response.json();
       console.log(data);
       if (data.success) {
         toast.success("Registration successful!");
         login(data.data.token, data.data);
         router.push('/');
       } else {
-        // Display the specific error message from the backend (e.g., weak password, existing email)
         toast.error(data.data || "Registration failed. Please try again.");
       }
     } catch (err) {
@@ -46,26 +63,33 @@ export default function RegisterPage() {
     } finally {
       setLoading(false);
     }
-    <Flex direction="column" gap="4">
+  };
+
+  return (
+    <Container size="1" p="4">
+      <Flex direction="column" justify="center" style={{ minHeight: '100vh' }}>
+        <Card>
+          <form onSubmit={handleRegister}>
+            <Flex direction="column" gap="4">
               <Text size="6" weight="bold" align="center">Register</Text>
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Full Name</Text>
-                <TextField.Root placeholder="Enter your name" name="fullName" required />
+                <TextField.Root placeholder="Enter your name" name="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
               </Flex>
 
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Email</Text>
-                <TextField.Root placeholder="Enter your email" type="email" name="email" required />
+                <TextField.Root placeholder="Enter your email" type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </Flex>
 
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Phone Number</Text>
-                <TextField.Root placeholder="+94771234570" type="tel" name="phoneNumber" required />
+                <TextField.Root placeholder="+94771234570" type="tel" name="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
               </Flex>
 
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Company Name</Text>
-                <TextField.Root placeholder="Enter company name" name="companyName" required />
+                <TextField.Root placeholder="Enter company name" name="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
               </Flex>
 
               <Flex direction="column" gap="2">
@@ -81,12 +105,12 @@ export default function RegisterPage() {
 
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Password</Text>
-                <TextField.Root placeholder="Create a password" type="password" name="password" required />
+                <TextField.Root placeholder="Create a password" type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </Flex>
 
               <Flex direction="column" gap="2">
                 <Text size="2" weight="bold">Re-enter Password</Text>
-                <TextField.Root placeholder="Confirm your password" type="password" name="confirmPassword" required />
+                <TextField.Root placeholder="Confirm your password" type="password" name="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
               </Flex>
 
               <Button size="3" type="submit" mt="2" disabled={loading}>
